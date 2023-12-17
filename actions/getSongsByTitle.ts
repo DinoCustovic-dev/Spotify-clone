@@ -9,7 +9,7 @@ const getSongsByTitle = async (title: string): Promise<Song[]> => {
     });
 
     if(!title) {
-        const allSongs = getSongs();
+        const allSongs = await getSongs();
         return allSongs;
     }
 
