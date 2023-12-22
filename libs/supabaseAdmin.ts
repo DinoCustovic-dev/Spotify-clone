@@ -105,13 +105,14 @@ const manageSubscriptionStatusChange = async (
 ) => {
   // Get customer's UUID from mapping table.
   const { data: customerData, error: noCustomerError } = await supabaseAdmin
-    .from('customers')
-    .select('id')
-    .eq('stripe_customer_id', customerId)
-    .single();
-  if (noCustomerError) throw noCustomerError;
+    .from("customers")
+    .select("id")
+    .eq("stripe_customer_id", customerId)
+    .limit(1);
 
-  const { id: uuid } = customerData!;
+  if (noCustomerError) throw noCustomerError;
+ 
+  const uuid = customerData[0].id;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method']

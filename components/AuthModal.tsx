@@ -33,7 +33,7 @@ const AuthModal = () => {
             title="Welcome back"
             description="Login to your acount"
             isOpen={isOpen}
-            onChange={() => {}}
+            onChange={onChange}
         >
             <Auth 
                 theme="dark"
