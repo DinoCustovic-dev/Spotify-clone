@@ -58,24 +58,34 @@ const createOrRetrieveCustomer = async ({
     .from('customers')
     .select('stripe_customer_id')
     .eq('id', uuid)
-    .single();
-  if (error || !data?.stripe_customer_id) {
+    .limit(1);
+
+  if (error || data.length === 0) {
     const customerData: { metadata: { supabaseUUID: string }; email?: string } =
       {
         metadata: {
           supabaseUUID: uuid
         }
       };
+
     if (email) customerData.email = email;
+
     const customer = await stripe.customers.create(customerData);
+
     const { error: supabaseError } = await supabaseAdmin
       .from('customers')
       .insert([{ id: uuid, stripe_customer_id: customer.id }]);
+
     if (supabaseError) throw supabaseError;
+
     console.log(`New customer created and inserted for ${uuid}.`);
+
     return customer.id;
   }
-  return data.stripe_customer_id;
+
+  // return existing Stripe customer id
+  return data[0].stripe_customer_id;
+
 };
 
 const copyBillingDetailsToCustomer = async (
@@ -103,6 +113,8 @@ const manageSubscriptionStatusChange = async (
   customerId: string,
   createAction = false
 ) => {
+  console.log({subscriptionId, customerId, createAction})
+
   // Get customer's UUID from mapping table.
   const { data: customerData, error: noCustomerError } = await supabaseAdmin
     .from("customers")
