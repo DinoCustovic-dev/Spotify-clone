@@ -84,7 +84,7 @@ const createOrRetrieveCustomer = async ({
   }
 
   // return existing Stripe customer id
-  return data[0].stripe_customer_id;
+  return data[0].stripe_customer_id || undefined;
 
 };
 
